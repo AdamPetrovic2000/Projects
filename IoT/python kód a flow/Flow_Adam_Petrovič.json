@@ -1,0 +1,3777 @@
+[
+    {
+        "id": "27c2d59ec81a557d",
+        "type": "subflow",
+        "name": "SendOnlyChange",
+        "info": "",
+        "category": "",
+        "in": [
+            {
+                "x": 300,
+                "y": 100,
+                "wires": [
+                    {
+                        "id": "0396e5a422e6542b"
+                    }
+                ]
+            }
+        ],
+        "out": [
+            {
+                "x": 680,
+                "y": 100,
+                "wires": [
+                    {
+                        "id": "0396e5a422e6542b",
+                        "port": 0
+                    }
+                ]
+            }
+        ],
+        "env": [
+            {
+                "name": "msg.topic",
+                "type": "str",
+                "value": ""
+            }
+        ],
+        "meta": {},
+        "color": "#DDAA99"
+    },
+    {
+        "id": "0396e5a422e6542b",
+        "type": "function",
+        "z": "27c2d59ec81a557d",
+        "name": "function 35",
+        "func": "msg.topic = env.get(\"msg.topic\")\nlet info = context.get(\"info\") || \"off\";\nif (msg.payload !== info) {\n    info = msg.payload;\n    context.set(\"info\", info);\n    return msg;\n}\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 490,
+        "y": 100,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "d2206452b1fa5f9b",
+        "type": "tab",
+        "label": "Semestralka",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "8c968827062c81c1",
+        "type": "mqtt in",
+        "z": "d2206452b1fa5f9b",
+        "name": "",
+        "topic": "s10/temp&humid&light&distance",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "427e68e619226e0a",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 130,
+        "y": 320,
+        "wires": [
+            [
+                "f6f17a6173682669",
+                "a41bb850cb509c56",
+                "a13fe1acc5b41c50",
+                "5723662de8bcd4a9"
+            ]
+        ]
+    },
+    {
+        "id": "f6f17a6173682669",
+        "type": "function",
+        "z": "d2206452b1fa5f9b",
+        "name": "Temp",
+        "func": "if (msg.temp != \"null\"){\n    msg.payload = msg.payload.temp;\n    return msg;\n}\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 450,
+        "y": 120,
+        "wires": [
+            [
+                "ee8e7be3a94db543",
+                "fcb68fb08c817b04",
+                "c267f46f0fdd57f4"
+            ]
+        ]
+    },
+    {
+        "id": "a41bb850cb509c56",
+        "type": "function",
+        "z": "d2206452b1fa5f9b",
+        "name": "Humid",
+        "func": "if (msg.humid != \"null\") {\n    msg.payload = msg.payload.humid;\n    return msg;\n}",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 470,
+        "y": 280,
+        "wires": [
+            [
+                "c9a110e8a87f8b5d",
+                "949100559cdd747d",
+                "cce814f2c83fc0af"
+            ]
+        ]
+    },
+    {
+        "id": "5723662de8bcd4a9",
+        "type": "function",
+        "z": "d2206452b1fa5f9b",
+        "name": "Volume",
+        "func": "// tu musis este logiku vypoctu\n// nejako takto\n// waterLevel/100 [mm] => dm \n// a potom tahodnota*100*100 => dm3/liter \n\nlet arr = context.get(\"arr\") || [];\ncontext.set(\"arr\", arr)\nlet level = parseInt(msg.payload.waterLevel);\narr.push(level)\nmsg.payload = arr;\nlet mean = 0;\nif (arr.length == 3) {\n    let sum = 0;\n    for (let i = 0; i < arr.length; i++) {\n        sum += arr[i];\n    }\n    mean = sum / arr.length;\n    \n    let volume = Math.round(mean/10)*10 ;\n    if (volume < 0){\n        volume = 0;\n    }\n    volume = 1000 - volume; // lebo vsak musim naopak\n    msg.payload = volume.toString();\n    context.set(\"arr\",[])\n    return msg;\n}\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 460,
+        "y": 560,
+        "wires": [
+            [
+                "cca0eb04e5b3a7e0",
+                "82f40400788fc26b",
+                "015ad6b0161a2767",
+                "90a876c938049533"
+            ]
+        ]
+    },
+    {
+        "id": "a13fe1acc5b41c50",
+        "type": "function",
+        "z": "d2206452b1fa5f9b",
+        "name": "lightLevel",
+        "func": "if (msg.lightLevel != \"null\") {\n    msg.payload = Math.round(msg.payload.lightLevel);\n    return msg;\n}",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 480,
+        "y": 420,
+        "wires": [
+            [
+                "5ea71a39c6ec14a4",
+                "e9dc62765076bfb1",
+                "79bf9838d08d281f"
+            ]
+        ]
+    },
+    {
+        "id": "ee8e7be3a94db543",
+        "type": "ui_gauge",
+        "z": "d2206452b1fa5f9b",
+        "name": "",
+        "group": "fdfa0c72f1d76fe4",
+        "order": 3,
+        "width": 6,
+        "height": 3,
+        "gtype": "gage",
+        "title": "Current temperature Greenhouse",
+        "label": "°C",
+        "format": "{{value}}",
+        "min": "-20",
+        "max": "50",
+        "colors": [
+            "#00a0f0",
+            "#d6e600",
+            "#ca3838"
+        ],
+        "seg1": "",
+        "seg2": "",
+        "diff": false,
+        "className": "",
+        "x": 700,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "c9a110e8a87f8b5d",
+        "type": "ui_gauge",
+        "z": "d2206452b1fa5f9b",
+        "name": "",
+        "group": "3d4fb68580f7a28e",
+        "order": 3,
+        "width": 6,
+        "height": 3,
+        "gtype": "gage",
+        "title": "Current humidity Greenhouse",
+        "label": "%",
+        "format": "{{value}}",
+        "min": 0,
+        "max": "100",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "",
+        "seg2": "",
+        "diff": false,
+        "className": "",
+        "x": 690,
+        "y": 240,
+        "wires": []
+    },
+    {
+        "id": "5ea71a39c6ec14a4",
+        "type": "ui_gauge",
+        "z": "d2206452b1fa5f9b",
+        "name": "",
+        "group": "faca84dd02887070",
+        "order": 3,
+        "width": 6,
+        "height": 3,
+        "gtype": "gage",
+        "title": "Light level Greenhouse",
+        "label": "lumen",
+        "format": "{{value}}",
+        "min": 0,
+        "max": "1000",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "",
+        "seg2": "",
+        "diff": false,
+        "className": "",
+        "x": 710,
+        "y": 400,
+        "wires": []
+    },
+    {
+        "id": "cca0eb04e5b3a7e0",
+        "type": "ui_gauge",
+        "z": "d2206452b1fa5f9b",
+        "name": "",
+        "group": "55e9dd8cd7e2c535",
+        "order": 3,
+        "width": 6,
+        "height": 7,
+        "gtype": "wave",
+        "title": "Water volume ",
+        "label": "Litres",
+        "format": "{{value}}",
+        "min": 0,
+        "max": "1000",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "",
+        "seg2": "",
+        "diff": false,
+        "className": "",
+        "x": 680,
+        "y": 560,
+        "wires": []
+    },
+    {
+        "id": "be0fe9536e7f9244",
+        "type": "ui_gauge",
+        "z": "d2206452b1fa5f9b",
+        "name": "",
+        "group": "fdfa0c72f1d76fe4",
+        "order": 5,
+        "width": 6,
+        "height": 3,
+        "gtype": "gage",
+        "title": "Current temperature Outside",
+        "label": "°C",
+        "format": "{{value}}",
+        "min": "-20",
+        "max": "40",
+        "colors": [
+            "#00a3f5",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "",
+        "seg2": "",
+        "diff": false,
+        "className": "",
+        "x": 960,
+        "y": 2840,
+        "wires": []
+    },
+    {
+        "id": "d1c5360458b5ee6a",
+        "type": "ui_gauge",
+        "z": "d2206452b1fa5f9b",
+        "name": "",
+        "group": "3d4fb68580f7a28e",
+        "order": 5,
+        "width": 6,
+        "height": 3,
+        "gtype": "gage",
+        "title": "Current humidity Outside",
+        "label": "%",
+        "format": "{{value}}",
+        "min": 0,
+        "max": "100",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "",
+        "seg2": "",
+        "diff": false,
+        "className": "",
+        "x": 970,
+        "y": 2900,
+        "wires": []
+    },
+    {
+        "id": "08d325f66e924ec3",
+        "type": "http request",
+        "z": "d2206452b1fa5f9b",
+        "name": "",
+        "method": "GET",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "https://api.openweathermap.org/data/2.5/weather?lat=49.11&lon=18.93&appid=117eacf6746c528c2e419a8f7ffc7865",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 390,
+        "y": 2880,
+        "wires": [
+            [
+                "9ce4122a039713d1",
+                "e22f5e0dc6d04cd6",
+                "4bd39bacfd6579c0",
+                "ec7872128f009d60",
+                "d6c31fe980f9f623",
+                "aa560180168c5f38"
+            ]
+        ]
+    },
+    {
+        "id": "9ce4122a039713d1",
+        "type": "function",
+        "z": "d2206452b1fa5f9b",
+        "name": "Temp API",
+        "func": "let tempAPI = msg.payload.main.temp;\nlet temp = Math.round((tempAPI - 273.15)*100)/100;\nmsg.payload = temp.toFixed(1)\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 680,
+        "y": 2840,
+        "wires": [
+            [
+                "be0fe9536e7f9244"
+            ]
+        ]
+    },
+    {
+        "id": "e22f5e0dc6d04cd6",
+        "type": "function",
+        "z": "d2206452b1fa5f9b",
+        "name": "Humid API",
+        "func": "msg.payload = msg.payload.main.humidity;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 690,
+        "y": 2900,
+        "wires": [
+            [
+                "d1c5360458b5ee6a"
+            ]
+        ]
+    },
+    {
+        "id": "157f04a31d41a802",
+        "type": "comment",
+        "z": "d2206452b1fa5f9b",
+        "name": "API POCASIE",
+        "info": "# API POCASIE",
+        "x": 830,
+        "y": 2740,
+        "wires": []
+    },
+    {
+        "id": "2d2b30fb72bb6cd6",
+        "type": "comment",
+        "z": "d2206452b1fa5f9b",
+        "name": "kazdu minut posielam HTTP  get request na API",
+        "info": "",
+        "x": 240,
+        "y": 2960,
+        "wires": []
+    },
+    {
+        "id": "4bd39bacfd6579c0",
+        "type": "function",
+        "z": "d2206452b1fa5f9b",
+        "name": "Sunrise API",
+        "func": "let sunrise = msg.payload.sys.sunrise;\nlet d = new Date(sunrise*1000);\nmsg.payload = d.getHours()+1+\":\"+d.getMinutes().toString().padStart(2, '0');\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 690,
+        "y": 3080,
+        "wires": [
+            [
+                "e3f72da859d943ac"
+            ]
+        ]
+    },
+    {
+        "id": "e3f72da859d943ac",
+        "type": "ui_text",
+        "z": "d2206452b1fa5f9b",
+        "group": "faca84dd02887070",
+        "order": 5,
+        "width": 6,
+        "height": 1,
+        "name": "",
+        "label": "Sunrise:",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "className": "",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#000000",
+        "x": 1020,
+        "y": 3080,
+        "wires": []
+    },
+    {
+        "id": "ec7872128f009d60",
+        "type": "function",
+        "z": "d2206452b1fa5f9b",
+        "name": "Sunset API",
+        "func": "let sunset = msg.payload.sys.sunset;\nlet d = new Date(sunset*1000);\nmsg.payload = d.getHours() + 1 + \":\" + d.getMinutes().toString().padStart(2, '0');\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 690,
+        "y": 2960,
+        "wires": [
+            [
+                "09fbb3fe30481c1e"
+            ]
+        ]
+    },
+    {
+        "id": "09fbb3fe30481c1e",
+        "type": "ui_text",
+        "z": "d2206452b1fa5f9b",
+        "group": "faca84dd02887070",
+        "order": 6,
+        "width": 6,
+        "height": 1,
+        "name": "",
+        "label": "Sunset:",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "className": "",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#000000",
+        "x": 1020,
+        "y": 2960,
+        "wires": []
+    },
+    {
+        "id": "d6c31fe980f9f623",
+        "type": "function",
+        "z": "d2206452b1fa5f9b",
+        "name": "Weather",
+        "func": "msg.payload = msg.payload.weather[0].main;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 680,
+        "y": 3020,
+        "wires": [
+            [
+                "05e475a7076dfd7b"
+            ]
+        ]
+    },
+    {
+        "id": "05e475a7076dfd7b",
+        "type": "ui_text",
+        "z": "d2206452b1fa5f9b",
+        "group": "faca84dd02887070",
+        "order": 7,
+        "width": 6,
+        "height": 1,
+        "name": "",
+        "label": "Weather:",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "className": "",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#000000",
+        "x": 1020,
+        "y": 3020,
+        "wires": []
+    },
+    {
+        "id": "5c926232fa9cb10e",
+        "type": "comment",
+        "z": "d2206452b1fa5f9b",
+        "name": "Vykreslovanie do UI",
+        "info": "",
+        "x": 610,
+        "y": 40,
+        "wires": []
+    },
+    {
+        "id": "aa560180168c5f38",
+        "type": "function",
+        "z": "d2206452b1fa5f9b",
+        "name": "Flow setter",
+        "func": "let infoAPI = msg.payload;\nflow.set(\"infoAPI\",infoAPI);",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 690,
+        "y": 2780,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "40a18b4f863943dd",
+        "type": "mqtt in",
+        "z": "d2206452b1fa5f9b",
+        "name": "",
+        "topic": "s10/temp&humid&light&distance",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "427e68e619226e0a",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 130,
+        "y": 920,
+        "wires": [
+            [
+                "e317d2a90f537cee",
+                "f436496eef4c1907"
+            ]
+        ]
+    },
+    {
+        "id": "505dff186d4cad0b",
+        "type": "comment",
+        "z": "d2206452b1fa5f9b",
+        "name": "Logika vetrania & tienenia",
+        "info": "",
+        "x": 570,
+        "y": 760,
+        "wires": []
+    },
+    {
+        "id": "e317d2a90f537cee",
+        "type": "function",
+        "z": "d2206452b1fa5f9b",
+        "name": "Humid&Temp Control",
+        "func": "let humid = msg.payload.humid;\nlet temp = msg.payload.temp;\n\nlet maxTemp = flow.get(\"maxTemp\");\nlet maxHumid = flow.get(\"maxHumid\");\n// ventControl je on/off/auto\nlet ventControl = flow.get(\"ventControl\");\n\nif (ventControl === \"auto\"){\n    \n    msg.notification = \"true\";\n\n    if (parseInt(humid) > maxHumid) {\n        msg.payload = \"on\";\n    }\n    else if (parseInt(temp) > maxTemp) {\n        msg.payload = \"on\";\n    }\n    else{\n        msg.payload = \"off\";\n    }\n}\nelse if (ventControl == false){\n    msg.payload = \"off\";\n    msg.notification = \"false\";\n}\nelse if (ventControl == true){\n    msg.payload = \"on\";\n    msg.notification = \"false\";\n}\nreturn msg;\n\n\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 440,
+        "y": 840,
+        "wires": [
+            [
+                "ed908f3606843cc5"
+            ]
+        ]
+    },
+    {
+        "id": "b93da281d2e02e01",
+        "type": "mqtt out",
+        "z": "d2206452b1fa5f9b",
+        "name": "",
+        "topic": "s10/humid&tempControl",
+        "qos": "",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "427e68e619226e0a",
+        "x": 990,
+        "y": 840,
+        "wires": []
+    },
+    {
+        "id": "f436496eef4c1907",
+        "type": "function",
+        "z": "d2206452b1fa5f9b",
+        "name": "Shading Control",
+        "func": "/*\n škala tienia\n 1000 = > priame slnko\n 900 a menej je fajn pre sklenik\n budem nastavitelne samozrejme\n*/\nlet lightLevel = msg.payload.lightLevel;\nlet maxLigthLevel = flow.get(\"maxLightLevel\");\nlet shadingControl = flow.get(\"shadControl\")\n\nif (shadingControl === \"auto\"){\n    \n    msg.notification = \"true\";\n\n    if (lightLevel > maxLigthLevel) {\n        msg.payload = \"on\";\n\n    } else if (lightLevel <= maxLigthLevel) {\n        msg.payload = \"off\";\n    }\n}\nelse if (shadingControl == true){\n    msg.payload = \"on\";\n    msg.notification = \"false\";\n}\nelse if (shadingControl == false){\n    msg.payload = \"off\";\n    msg.notification = \"false\";\n}\nreturn msg;\n\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 420,
+        "y": 1020,
+        "wires": [
+            [
+                "55d728f1a02fc6ab"
+            ]
+        ]
+    },
+    {
+        "id": "b165c00e7c9f1110",
+        "type": "mqtt out",
+        "z": "d2206452b1fa5f9b",
+        "name": "",
+        "topic": "s10/shading",
+        "qos": "",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "427e68e619226e0a",
+        "x": 930,
+        "y": 1020,
+        "wires": []
+    },
+    {
+        "id": "7c1c60d86b6a1a95",
+        "type": "ui_toast",
+        "z": "d2206452b1fa5f9b",
+        "position": "top right",
+        "displayTime": "3",
+        "highlight": "",
+        "sendall": true,
+        "outputs": 0,
+        "ok": "OK",
+        "cancel": "",
+        "raw": false,
+        "className": "",
+        "topic": "",
+        "name": "Shading",
+        "x": 1100,
+        "y": 1080,
+        "wires": []
+    },
+    {
+        "id": "55d728f1a02fc6ab",
+        "type": "subflow:27c2d59ec81a557d",
+        "z": "d2206452b1fa5f9b",
+        "name": "",
+        "env": [
+            {
+                "name": "msg.topic",
+                "value": "Shading",
+                "type": "str"
+            }
+        ],
+        "x": 670,
+        "y": 1020,
+        "wires": [
+            [
+                "b165c00e7c9f1110",
+                "4e6b4fd00eeadbae",
+                "cb1845f8fe0d6502"
+            ]
+        ]
+    },
+    {
+        "id": "c944091831020801",
+        "type": "cronplus",
+        "z": "d2206452b1fa5f9b",
+        "name": "",
+        "outputField": "payload",
+        "timeZone": "",
+        "storeName": "",
+        "commandResponseMsgOutput": "output1",
+        "defaultLocation": "",
+        "defaultLocationType": "default",
+        "outputs": 1,
+        "options": [
+            {
+                "name": "schedule1",
+                "topic": "topic1",
+                "payloadType": "default",
+                "payload": "",
+                "expressionType": "cron",
+                "expression": "0 * * * * * *",
+                "location": "",
+                "offset": "0",
+                "solarType": "all",
+                "solarEvents": "sunrise,sunset"
+            }
+        ],
+        "x": 160,
+        "y": 2880,
+        "wires": [
+            [
+                "08d325f66e924ec3"
+            ]
+        ]
+    },
+    {
+        "id": "2e8a4740151ce545",
+        "type": "comment",
+        "z": "d2206452b1fa5f9b",
+        "name": "Format  do planovača",
+        "info": " {\"name\":\"lala\",\n \"expression\":\"0  13 15 *  *  *  *  \",\n \"command\":\"add\",\n \"type\":\"str\"}",
+        "x": 1140,
+        "y": 2240,
+        "wires": []
+    },
+    {
+        "id": "dff5edbf8caca5b8",
+        "type": "comment",
+        "z": "d2206452b1fa5f9b",
+        "name": "MUSI UKAZOVAŤ VŽDY O HODINU MENEJ NA PLANERY",
+        "info": "",
+        "x": 320,
+        "y": 2440,
+        "wires": []
+    },
+    {
+        "id": "7a99d2dd8fbacc26",
+        "type": "comment",
+        "z": "d2206452b1fa5f9b",
+        "name": "LOGIKA POLIEVANIA A PLANOVANIE POLIEVANIA",
+        "info": "",
+        "x": 810,
+        "y": 2080,
+        "wires": []
+    },
+    {
+        "id": "83b26c408ed33f9d",
+        "type": "comment",
+        "z": "d2206452b1fa5f9b",
+        "name": "MUSI UKAZOVAŤ VŽDY O HODINU MENEJ NA PLANERY",
+        "info": "",
+        "x": 280,
+        "y": 3000,
+        "wires": []
+    },
+    {
+        "id": "51e757c0ecb97084",
+        "type": "comment",
+        "z": "d2206452b1fa5f9b",
+        "name": "Setter elements",
+        "info": "",
+        "x": 600,
+        "y": 1660,
+        "wires": []
+    },
+    {
+        "id": "fbdc9eb5c2c2f403",
+        "type": "ui_text_input",
+        "z": "d2206452b1fa5f9b",
+        "name": "",
+        "label": "",
+        "tooltip": "",
+        "group": "430ad6f95d0ddfa3",
+        "order": 8,
+        "width": 3,
+        "height": 1,
+        "passthru": true,
+        "mode": "time",
+        "delay": "1",
+        "topic": "topic",
+        "sendOnBlur": true,
+        "className": "",
+        "topicType": "msg",
+        "x": 440,
+        "y": 2280,
+        "wires": [
+            [
+                "ded8c22a56616425",
+                "309ebc0b3aed6a84"
+            ]
+        ]
+    },
+    {
+        "id": "bb72b715ad537409",
+        "type": "ui_switch",
+        "z": "d2206452b1fa5f9b",
+        "name": "",
+        "label": "Set watering automaticky by sunset:",
+        "tooltip": "",
+        "group": "430ad6f95d0ddfa3",
+        "order": 9,
+        "width": 7,
+        "height": 1,
+        "passthru": true,
+        "decouple": "false",
+        "topic": "topic",
+        "topicType": "msg",
+        "style": "",
+        "onvalue": "true",
+        "onvalueType": "bool",
+        "onicon": "",
+        "oncolor": "",
+        "offvalue": "false",
+        "offvalueType": "bool",
+        "officon": "",
+        "offcolor": "",
+        "animate": false,
+        "className": "",
+        "x": 570,
+        "y": 2140,
+        "wires": [
+            [
+                "c662cb1da3fd4b79",
+                "65b487d7d3faa487"
+            ]
+        ]
+    },
+    {
+        "id": "c662cb1da3fd4b79",
+        "type": "function",
+        "z": "d2206452b1fa5f9b",
+        "name": "Setter",
+        "func": "flow.set(\"wateringSetter\",msg.payload);",
+        "outputs": 0,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 870,
+        "y": 2140,
+        "wires": []
+    },
+    {
+        "id": "5e4d4132642bf53b",
+        "type": "inject",
+        "z": "d2206452b1fa5f9b",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "true",
+        "payloadType": "bool",
+        "x": 150,
+        "y": 2140,
+        "wires": [
+            [
+                "bb72b715ad537409",
+                "fe1cfda9caeafff6"
+            ]
+        ]
+    },
+    {
+        "id": "fe1cfda9caeafff6",
+        "type": "function",
+        "z": "d2206452b1fa5f9b",
+        "name": "sunsetGetter",
+        "func": "let api = flow.get(\"infoAPI\");\nlet sunset = api.sys.sunset;\nlet d = new Date(sunset * 1000);\nlet sunsetObj = {\n    hours: d.getHours(),\n    minutes: d.getMinutes(),\n}\nflow.set(\"sunset\", sunsetObj)\nflow.set(\"wateringNow\",false)\nlet hours = parseInt(d.getHours()+1);\nlet minutes = parseInt(d.getMinutes());\nmsg.payload = ((hours * 3600) + (minutes * 60)) * 1000;\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 250,
+        "y": 2280,
+        "wires": [
+            [
+                "fbdc9eb5c2c2f403",
+                "ded8c22a56616425"
+            ]
+        ]
+    },
+    {
+        "id": "ded8c22a56616425",
+        "type": "function",
+        "z": "d2206452b1fa5f9b",
+        "name": "Logika",
+        "func": "if (flow.get(\"wateringSetter\")){\n    let getter = flow.get(\"sunset\");\n    let hours = (parseInt(getter.hours)).toString();\n    msg.payload = {\n        \"name\": \"Watering\",\n        \"expression\": \"0 \" + getter.minutes + \" \" + hours + \" *  *  *  * \",\n        \"command\": \"add\",\n        \"type\": \"str\",\n    }\n    return [msg,msg];\n}\nelse if (!flow.get(\"wateringSetter\")){\n    let d = new Date(msg.payload);\n    let hours = (parseInt(d.getHours()) - 1).toString();\n    msg.payload = {\n        \"name\": \"Watering\",\n        \"expression\": \"0 \" + d.getMinutes() + \" \" + hours + \" *  *  *  * \",\n        \"command\": \"add\",\n        \"type\": \"str\",\n    }\n    return [null,msg];\n\n}\n",
+        "outputs": 2,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 670,
+        "y": 2280,
+        "wires": [
+            [
+                "65b487d7d3faa487"
+            ],
+            [
+                "9386f4f289297390"
+            ]
+        ]
+    },
+    {
+        "id": "9e0aec9cd60a988c",
+        "type": "cronplus",
+        "z": "d2206452b1fa5f9b",
+        "name": "polievač scheduler",
+        "outputField": "payload",
+        "timeZone": "",
+        "storeName": "",
+        "commandResponseMsgOutput": "output1",
+        "defaultLocation": "",
+        "defaultLocationType": "default",
+        "outputs": 1,
+        "options": [],
+        "x": 1130,
+        "y": 2280,
+        "wires": [
+            [
+                "cc7a991faf39cab9"
+            ]
+        ]
+    },
+    {
+        "id": "9386f4f289297390",
+        "type": "rbe",
+        "z": "d2206452b1fa5f9b",
+        "name": "",
+        "func": "rbe",
+        "gap": "",
+        "start": "",
+        "inout": "out",
+        "septopics": true,
+        "property": "payload",
+        "topi": "topic",
+        "x": 930,
+        "y": 2280,
+        "wires": [
+            [
+                "9e0aec9cd60a988c"
+            ]
+        ]
+    },
+    {
+        "id": "309ebc0b3aed6a84",
+        "type": "function",
+        "z": "d2206452b1fa5f9b",
+        "name": "Notifikacia",
+        "func": "if (flow.get(\"wateringSetter\")){\n    msg.topic = \"Warning\";\n    msg.payload = \"Set default by sunset is selected.\" + \" If you want to change time disable it first!\";\n    return msg;\n}\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 670,
+        "y": 2360,
+        "wires": [
+            [
+                "9067280b83eb3a48"
+            ]
+        ]
+    },
+    {
+        "id": "9067280b83eb3a48",
+        "type": "ui_toast",
+        "z": "d2206452b1fa5f9b",
+        "position": "top right",
+        "displayTime": "2",
+        "highlight": "",
+        "sendall": true,
+        "outputs": 0,
+        "ok": "OK",
+        "cancel": "",
+        "raw": false,
+        "className": "",
+        "topic": "",
+        "name": "",
+        "x": 880,
+        "y": 2360,
+        "wires": []
+    },
+    {
+        "id": "b8207af988debfc6",
+        "type": "comment",
+        "z": "d2206452b1fa5f9b",
+        "name": "on start setne by sunset",
+        "info": "",
+        "x": 220,
+        "y": 2060,
+        "wires": []
+    },
+    {
+        "id": "cc7a991faf39cab9",
+        "type": "link out",
+        "z": "d2206452b1fa5f9b",
+        "name": "polievanie out vys",
+        "mode": "link",
+        "links": [
+            "cc3b1b85b405ce46"
+        ],
+        "x": 1265,
+        "y": 2280,
+        "wires": []
+    },
+    {
+        "id": "cc3b1b85b405ce46",
+        "type": "link in",
+        "z": "d2206452b1fa5f9b",
+        "name": "polievanie out prijm",
+        "links": [
+            "cc7a991faf39cab9"
+        ],
+        "x": 155,
+        "y": 2500,
+        "wires": [
+            [
+                "6ec99be806ce82c2"
+            ]
+        ]
+    },
+    {
+        "id": "c9428b483e322bc5",
+        "type": "function",
+        "z": "d2206452b1fa5f9b",
+        "name": "Sender",
+        "func": "if (flow.get(\"wateringControl\") == \"auto\"){\n    msg.payload = \"on\";\n    flow.set(\"wateringNow\",true);\n    return msg;\n}\nelse{\n    return null;\n}",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 400,
+        "y": 2500,
+        "wires": [
+            [
+                "84ebe8f4b4057958",
+                "3daecf91bb7b19bf"
+            ]
+        ]
+    },
+    {
+        "id": "84ebe8f4b4057958",
+        "type": "delay",
+        "z": "d2206452b1fa5f9b",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "5",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "allowrate": false,
+        "outputs": 1,
+        "x": 540,
+        "y": 2600,
+        "wires": [
+            [
+                "e57eb8583a72e590"
+            ]
+        ]
+    },
+    {
+        "id": "ccb5381d51ce8f40",
+        "type": "mqtt out",
+        "z": "d2206452b1fa5f9b",
+        "name": "",
+        "topic": "s10/watering",
+        "qos": "",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "427e68e619226e0a",
+        "x": 1210,
+        "y": 2420,
+        "wires": []
+    },
+    {
+        "id": "4d4d011a442a4948",
+        "type": "comment",
+        "z": "d2206452b1fa5f9b",
+        "name": "// msg.delay = ... ; vies si zmenit delay",
+        "info": "",
+        "x": 270,
+        "y": 2540,
+        "wires": []
+    },
+    {
+        "id": "65b487d7d3faa487",
+        "type": "link out",
+        "z": "d2206452b1fa5f9b",
+        "name": "spatna vazba vys",
+        "mode": "link",
+        "links": [
+            "b736a7f3e21436cc"
+        ],
+        "x": 785,
+        "y": 2200,
+        "wires": []
+    },
+    {
+        "id": "b736a7f3e21436cc",
+        "type": "link in",
+        "z": "d2206452b1fa5f9b",
+        "name": "spatna vazba prij",
+        "links": [
+            "65b487d7d3faa487"
+        ],
+        "x": 85,
+        "y": 2280,
+        "wires": [
+            [
+                "fe1cfda9caeafff6"
+            ]
+        ]
+    },
+    {
+        "id": "c6d847ac5ae88adc",
+        "type": "ui_text",
+        "z": "d2206452b1fa5f9b",
+        "group": "cd549b9206037b0a",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Ventilation is:",
+        "format": "{{msg.payload}}",
+        "layout": "row-center",
+        "className": "",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#000000",
+        "x": 950,
+        "y": 780,
+        "wires": []
+    },
+    {
+        "id": "4e6b4fd00eeadbae",
+        "type": "ui_text",
+        "z": "d2206452b1fa5f9b",
+        "group": "cd549b9206037b0a",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Shading is:",
+        "format": "{{msg.payload}}",
+        "layout": "row-center",
+        "className": "",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#000000",
+        "x": 930,
+        "y": 960,
+        "wires": []
+    },
+    {
+        "id": "9bf1b7019bd74b68",
+        "type": "ui_text",
+        "z": "d2206452b1fa5f9b",
+        "group": "cd549b9206037b0a",
+        "order": 3,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Watering is:",
+        "format": "{{msg.payload}}",
+        "layout": "row-center",
+        "className": "",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#000000",
+        "x": 1210,
+        "y": 2500,
+        "wires": []
+    },
+    {
+        "id": "d24ac5d4682aa898",
+        "type": "inject",
+        "z": "d2206452b1fa5f9b",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 1100,
+        "y": 2340,
+        "wires": [
+            [
+                "cc7a991faf39cab9"
+            ]
+        ]
+    },
+    {
+        "id": "6d6a023f586ac6fc",
+        "type": "ui_toast",
+        "z": "d2206452b1fa5f9b",
+        "position": "top right",
+        "displayTime": "3",
+        "highlight": "",
+        "sendall": true,
+        "outputs": 0,
+        "ok": "OK",
+        "cancel": "",
+        "raw": false,
+        "className": "",
+        "topic": "Watering",
+        "name": "",
+        "x": 1220,
+        "y": 2580,
+        "wires": []
+    },
+    {
+        "id": "5548f0f0850e2369",
+        "type": "mqtt in",
+        "z": "d2206452b1fa5f9b",
+        "name": "",
+        "topic": "s10/manualControlToNodeRed",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "427e68e619226e0a",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 1230,
+        "y": 360,
+        "wires": [
+            [
+                "81a3848f3617b31c"
+            ]
+        ]
+    },
+    {
+        "id": "7c063b5da50a0533",
+        "type": "ui_text",
+        "z": "d2206452b1fa5f9b",
+        "group": "fdfa0c72f1d76fe4",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Measuring mode: ",
+        "format": "{{msg.payload}}",
+        "layout": "row-center",
+        "className": "",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#000000",
+        "x": 1810,
+        "y": 360,
+        "wires": []
+    },
+    {
+        "id": "6e749e03e1014266",
+        "type": "comment",
+        "z": "d2206452b1fa5f9b",
+        "name": "Device info from nodeMCU",
+        "info": "",
+        "x": 1490,
+        "y": 300,
+        "wires": []
+    },
+    {
+        "id": "c4dc3e90122c6be3",
+        "type": "ui_text",
+        "z": "d2206452b1fa5f9b",
+        "group": "430ad6f95d0ddfa3",
+        "order": 1,
+        "width": 5,
+        "height": 1,
+        "name": "",
+        "label": "Set max temperature (°C):",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "className": "",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#000000",
+        "x": 600,
+        "y": 1720,
+        "wires": []
+    },
+    {
+        "id": "410a34f1902fa21a",
+        "type": "function",
+        "z": "d2206452b1fa5f9b",
+        "name": "Flow setter",
+        "func": "flow.set(\"maxTemp\",msg.payload);\nreturn msg;",
+        "outputs": 0,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 810,
+        "y": 1760,
+        "wires": []
+    },
+    {
+        "id": "a0f1ac98ac44f697",
+        "type": "inject",
+        "z": "d2206452b1fa5f9b",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "32",
+        "payloadType": "num",
+        "x": 310,
+        "y": 1760,
+        "wires": [
+            [
+                "e02ccf8e74b39135",
+                "410a34f1902fa21a"
+            ]
+        ]
+    },
+    {
+        "id": "63586899176dfea4",
+        "type": "inject",
+        "z": "d2206452b1fa5f9b",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "50",
+        "payloadType": "num",
+        "x": 310,
+        "y": 1860,
+        "wires": [
+            [
+                "664fd0aad32d7b8c",
+                "bbb6d5ca4d654731"
+            ]
+        ]
+    },
+    {
+        "id": "60c52d8e13123fa4",
+        "type": "ui_text",
+        "z": "d2206452b1fa5f9b",
+        "group": "430ad6f95d0ddfa3",
+        "order": 3,
+        "width": 5,
+        "height": 1,
+        "name": "",
+        "label": "Set max humidity (%):",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "className": "",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#000000",
+        "x": 580,
+        "y": 1820,
+        "wires": []
+    },
+    {
+        "id": "bbb6d5ca4d654731",
+        "type": "function",
+        "z": "d2206452b1fa5f9b",
+        "name": "Flow setter",
+        "func": "flow.set(\"maxHumid\", msg.payload);\nreturn msg;",
+        "outputs": 0,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 790,
+        "y": 1860,
+        "wires": []
+    },
+    {
+        "id": "e02ccf8e74b39135",
+        "type": "ui_text_input",
+        "z": "d2206452b1fa5f9b",
+        "name": "",
+        "label": "",
+        "tooltip": "",
+        "group": "430ad6f95d0ddfa3",
+        "order": 2,
+        "width": 2,
+        "height": 1,
+        "passthru": true,
+        "mode": "number",
+        "delay": "1",
+        "topic": "topic",
+        "sendOnBlur": true,
+        "className": "",
+        "topicType": "msg",
+        "x": 590,
+        "y": 1760,
+        "wires": [
+            [
+                "410a34f1902fa21a"
+            ]
+        ]
+    },
+    {
+        "id": "664fd0aad32d7b8c",
+        "type": "ui_text_input",
+        "z": "d2206452b1fa5f9b",
+        "name": "",
+        "label": "",
+        "tooltip": "",
+        "group": "430ad6f95d0ddfa3",
+        "order": 4,
+        "width": 2,
+        "height": 1,
+        "passthru": true,
+        "mode": "number",
+        "delay": "1",
+        "topic": "topic",
+        "sendOnBlur": true,
+        "className": "",
+        "topicType": "msg",
+        "x": 570,
+        "y": 1860,
+        "wires": [
+            [
+                "bbb6d5ca4d654731"
+            ]
+        ]
+    },
+    {
+        "id": "e00a39f81a4f0363",
+        "type": "inject",
+        "z": "d2206452b1fa5f9b",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "900",
+        "payloadType": "num",
+        "x": 310,
+        "y": 1940,
+        "wires": [
+            [
+                "7b644728e8da1744",
+                "89aa30467107bd04"
+            ]
+        ]
+    },
+    {
+        "id": "7b644728e8da1744",
+        "type": "ui_text_input",
+        "z": "d2206452b1fa5f9b",
+        "name": "",
+        "label": "",
+        "tooltip": "",
+        "group": "430ad6f95d0ddfa3",
+        "order": 6,
+        "width": 2,
+        "height": 1,
+        "passthru": true,
+        "mode": "number",
+        "delay": "1",
+        "topic": "topic",
+        "sendOnBlur": true,
+        "className": "",
+        "topicType": "msg",
+        "x": 570,
+        "y": 1940,
+        "wires": [
+            [
+                "89aa30467107bd04"
+            ]
+        ]
+    },
+    {
+        "id": "89aa30467107bd04",
+        "type": "function",
+        "z": "d2206452b1fa5f9b",
+        "name": "Flow setter",
+        "func": "flow.set(\"maxLightLevel\", msg.payload);\nreturn msg;",
+        "outputs": 0,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 810,
+        "y": 1940,
+        "wires": []
+    },
+    {
+        "id": "89d6585b7eeee5f1",
+        "type": "ui_text",
+        "z": "d2206452b1fa5f9b",
+        "group": "430ad6f95d0ddfa3",
+        "order": 5,
+        "width": 5,
+        "height": 1,
+        "name": "",
+        "label": "Set max light level (lumen):",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "className": "",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#000000",
+        "x": 580,
+        "y": 1900,
+        "wires": []
+    },
+    {
+        "id": "3538b69f0b0b0f2d",
+        "type": "comment",
+        "z": "d2206452b1fa5f9b",
+        "name": "Manual control",
+        "info": "",
+        "x": 660,
+        "y": 1180,
+        "wires": []
+    },
+    {
+        "id": "3daecf91bb7b19bf",
+        "type": "function",
+        "z": "d2206452b1fa5f9b",
+        "name": "Spliter",
+        "func": "\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 870,
+        "y": 2500,
+        "wires": [
+            [
+                "ccb5381d51ce8f40",
+                "9bf1b7019bd74b68",
+                "6d6a023f586ac6fc"
+            ]
+        ]
+    },
+    {
+        "id": "17f387c0da7b7cb8",
+        "type": "comment",
+        "z": "d2206452b1fa5f9b",
+        "name": "Defaultne hodnoty",
+        "info": "",
+        "x": 310,
+        "y": 1700,
+        "wires": []
+    },
+    {
+        "id": "92eb800693cdb8ac",
+        "type": "inject",
+        "z": "d2206452b1fa5f9b",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "auto",
+        "payloadType": "str",
+        "x": 150,
+        "y": 1360,
+        "wires": [
+            [
+                "84cd3fc1529a16e2",
+                "3e21c7849bcfa98a",
+                "0c0fbf8588264f0d"
+            ]
+        ]
+    },
+    {
+        "id": "84cd3fc1529a16e2",
+        "type": "ui_dropdown",
+        "z": "d2206452b1fa5f9b",
+        "name": "",
+        "label": "Ventilation mode: ",
+        "tooltip": "",
+        "place": "Select option",
+        "group": "3af087ba73d32313",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "passthru": true,
+        "multiple": false,
+        "options": [
+            {
+                "label": "auto",
+                "value": "auto",
+                "type": "str"
+            },
+            {
+                "label": "on",
+                "value": true,
+                "type": "bool"
+            },
+            {
+                "label": "off",
+                "value": false,
+                "type": "bool"
+            }
+        ],
+        "payload": "",
+        "topic": "topic",
+        "topicType": "msg",
+        "className": "",
+        "x": 410,
+        "y": 1220,
+        "wires": [
+            [
+                "925a955e8e68dc75"
+            ]
+        ]
+    },
+    {
+        "id": "3e21c7849bcfa98a",
+        "type": "ui_dropdown",
+        "z": "d2206452b1fa5f9b",
+        "name": "",
+        "label": "Shading mode: ",
+        "tooltip": "",
+        "place": "Select option",
+        "group": "3af087ba73d32313",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "passthru": true,
+        "multiple": false,
+        "options": [
+            {
+                "label": "auto",
+                "value": "auto",
+                "type": "str"
+            },
+            {
+                "label": "on",
+                "value": true,
+                "type": "bool"
+            },
+            {
+                "label": "off",
+                "value": false,
+                "type": "bool"
+            }
+        ],
+        "payload": "",
+        "topic": "topic",
+        "topicType": "msg",
+        "className": "",
+        "x": 400,
+        "y": 1360,
+        "wires": [
+            [
+                "737bbe75b442229a"
+            ]
+        ]
+    },
+    {
+        "id": "878ec3e2ea2a175e",
+        "type": "ui_text",
+        "z": "d2206452b1fa5f9b",
+        "group": "3d4fb68580f7a28e",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Ventilation mode:",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "className": "",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#000000",
+        "x": 870,
+        "y": 1220,
+        "wires": []
+    },
+    {
+        "id": "925a955e8e68dc75",
+        "type": "function",
+        "z": "d2206452b1fa5f9b",
+        "name": "Formater & Setter",
+        "func": "flow.set(\"ventControl\", msg.payload);\nif (msg.payload == \"auto\"){\n    msg.payload = \"auto\";\n}\nelse if (!msg.payload){\n    msg.payload = \"admin. off\";\n}\nelse{\n    msg.payload = \"admin. on\"\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 650,
+        "y": 1220,
+        "wires": [
+            [
+                "878ec3e2ea2a175e"
+            ]
+        ]
+    },
+    {
+        "id": "cb49809c1c389fbe",
+        "type": "ui_text",
+        "z": "d2206452b1fa5f9b",
+        "group": "faca84dd02887070",
+        "order": 1,
+        "width": 6,
+        "height": 1,
+        "name": "",
+        "label": "Shading mode:",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "className": "",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#000000",
+        "x": 880,
+        "y": 1360,
+        "wires": []
+    },
+    {
+        "id": "737bbe75b442229a",
+        "type": "function",
+        "z": "d2206452b1fa5f9b",
+        "name": "Formater & Setter",
+        "func": "flow.set(\"shadControl\",msg.payload);\n\nif (msg.payload == \"auto\"){\n    msg.payload = \"auto\";\n    \n}else if (!msg.payload){\n    msg.payload = \"admin. off\";\n}\nelse{\n    msg.payload = \"admin. on\"\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 630,
+        "y": 1360,
+        "wires": [
+            [
+                "cb49809c1c389fbe"
+            ]
+        ]
+    },
+    {
+        "id": "d212c26b39a6f2e4",
+        "type": "ui_text",
+        "z": "d2206452b1fa5f9b",
+        "group": "3d4fb68580f7a28e",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "------------------------------",
+        "format": "",
+        "layout": "row-center",
+        "className": "",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#000000",
+        "x": 1220,
+        "y": 120,
+        "wires": []
+    },
+    {
+        "id": "3d35e6b2fea924de",
+        "type": "ui_text",
+        "z": "d2206452b1fa5f9b",
+        "group": "faca84dd02887070",
+        "order": 2,
+        "width": 6,
+        "height": 1,
+        "name": "",
+        "label": "------------------------------",
+        "format": "",
+        "layout": "row-center",
+        "className": "",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#000000",
+        "x": 1220,
+        "y": 160,
+        "wires": []
+    },
+    {
+        "id": "4e502637119e077b",
+        "type": "ui_text",
+        "z": "d2206452b1fa5f9b",
+        "group": "fdfa0c72f1d76fe4",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "------------------------------",
+        "format": "",
+        "layout": "row-center",
+        "className": "",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#000000",
+        "x": 1460,
+        "y": 120,
+        "wires": []
+    },
+    {
+        "id": "261e16c7c0fee926",
+        "type": "ui_text",
+        "z": "d2206452b1fa5f9b",
+        "group": "fdfa0c72f1d76fe4",
+        "order": 4,
+        "width": 6,
+        "height": 1,
+        "name": "",
+        "label": "------------------------------",
+        "format": "",
+        "layout": "row-center",
+        "className": "",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#000000",
+        "x": 1460,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "a591a02c0d83da8b",
+        "type": "ui_text",
+        "z": "d2206452b1fa5f9b",
+        "group": "3d4fb68580f7a28e",
+        "order": 4,
+        "width": 6,
+        "height": 1,
+        "name": "",
+        "label": "------------------------------",
+        "format": "",
+        "layout": "row-center",
+        "className": "",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#000000",
+        "x": 1460,
+        "y": 160,
+        "wires": []
+    },
+    {
+        "id": "ee48ccacc1616120",
+        "type": "ui_text",
+        "z": "d2206452b1fa5f9b",
+        "group": "faca84dd02887070",
+        "order": 4,
+        "width": 6,
+        "height": 1,
+        "name": "",
+        "label": "------------------------------",
+        "format": "",
+        "layout": "row-center",
+        "className": "",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#000000",
+        "x": 1460,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "134744a5a56f0b72",
+        "type": "ui_text",
+        "z": "d2206452b1fa5f9b",
+        "group": "55e9dd8cd7e2c535",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "------------------------------",
+        "format": "",
+        "layout": "row-center",
+        "className": "",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#000000",
+        "x": 1220,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "0c0fbf8588264f0d",
+        "type": "ui_dropdown",
+        "z": "d2206452b1fa5f9b",
+        "name": "",
+        "label": "Watering mode: ",
+        "tooltip": "",
+        "place": "Select option",
+        "group": "3af087ba73d32313",
+        "order": 3,
+        "width": 0,
+        "height": 0,
+        "passthru": true,
+        "multiple": false,
+        "options": [
+            {
+                "label": "auto",
+                "value": "auto",
+                "type": "str"
+            },
+            {
+                "label": "on",
+                "value": true,
+                "type": "bool"
+            },
+            {
+                "label": "off",
+                "value": false,
+                "type": "bool"
+            }
+        ],
+        "payload": "",
+        "topic": "topic",
+        "topicType": "msg",
+        "className": "",
+        "x": 400,
+        "y": 1480,
+        "wires": [
+            [
+                "9ce36fca33dde1a9",
+                "e80c77ad82e9c28b"
+            ]
+        ]
+    },
+    {
+        "id": "e80c77ad82e9c28b",
+        "type": "function",
+        "z": "d2206452b1fa5f9b",
+        "name": " Setter",
+        "func": "flow.set(\"wateringControl\",msg.payload);\n\nif (msg.payload == true){\n    msg.payload = \"on\";\n    return [msg,msg];\n    \n}else if (msg.payload == false){\n    msg.payload = \"off\";\n    return [msg,msg];\n}\nelse if(msg.payload == \"auto\" && flow.get(\"wateringNow\") == false){\n    msg.payload = \"off\";\n    return [msg,msg];\n}\n\n\n\n\n",
+        "outputs": 2,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 590,
+        "y": 1540,
+        "wires": [
+            [
+                "76ec3040aaa7a4bb"
+            ],
+            [
+                "b4bbab9c770f5bbd"
+            ]
+        ]
+    },
+    {
+        "id": "b4bbab9c770f5bbd",
+        "type": "link out",
+        "z": "d2206452b1fa5f9b",
+        "name": "UI update water vys",
+        "mode": "link",
+        "links": [
+            "a411db10b98866d3"
+        ],
+        "x": 875,
+        "y": 1560,
+        "wires": []
+    },
+    {
+        "id": "2ddfe72fade00067",
+        "type": "ui_text",
+        "z": "d2206452b1fa5f9b",
+        "group": "55e9dd8cd7e2c535",
+        "order": 1,
+        "width": 6,
+        "height": 1,
+        "name": "",
+        "label": "Watering mode:",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "className": "",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#000000",
+        "x": 880,
+        "y": 1440,
+        "wires": []
+    },
+    {
+        "id": "9ce36fca33dde1a9",
+        "type": "function",
+        "z": "d2206452b1fa5f9b",
+        "name": "Formater",
+        "func": "if (msg.payload == \"auto\"){\n    msg.payload = \"auto\";\n}else if (!msg.payload){\n    msg.payload = \"admin. off\";\n}\nelse{\n    msg.payload = \"admin. on\"\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 600,
+        "y": 1440,
+        "wires": [
+            [
+                "2ddfe72fade00067"
+            ]
+        ]
+    },
+    {
+        "id": "a411db10b98866d3",
+        "type": "link in",
+        "z": "d2206452b1fa5f9b",
+        "name": "UI update water prijm",
+        "links": [
+            "b4bbab9c770f5bbd"
+        ],
+        "x": 905,
+        "y": 2500,
+        "wires": [
+            [
+                "9bf1b7019bd74b68"
+            ]
+        ]
+    },
+    {
+        "id": "76ec3040aaa7a4bb",
+        "type": "mqtt out",
+        "z": "d2206452b1fa5f9b",
+        "name": "",
+        "topic": "s10/watering",
+        "qos": "",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "427e68e619226e0a",
+        "x": 910,
+        "y": 1500,
+        "wires": []
+    },
+    {
+        "id": "6ec99be806ce82c2",
+        "type": "delay",
+        "z": "d2206452b1fa5f9b",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "1",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "allowrate": false,
+        "outputs": 1,
+        "x": 260,
+        "y": 2500,
+        "wires": [
+            [
+                "c9428b483e322bc5"
+            ]
+        ]
+    },
+    {
+        "id": "e57eb8583a72e590",
+        "type": "function",
+        "z": "d2206452b1fa5f9b",
+        "name": "Formater & checker",
+        "func": "if (flow.get(\"wateringControl\") != \"auto\") {\n    return null;\n}\nelse {\n    msg.payload = \"off\";\n    flow.set(\"wateringNow\",false);\n    return msg;\n}",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 710,
+        "y": 2600,
+        "wires": [
+            [
+                "3daecf91bb7b19bf"
+            ]
+        ]
+    },
+    {
+        "id": "93491ba5c24c95e5",
+        "type": "ui_text",
+        "z": "d2206452b1fa5f9b",
+        "group": "430ad6f95d0ddfa3",
+        "order": 7,
+        "width": 4,
+        "height": 1,
+        "name": "",
+        "label": "Watering time:",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "className": "",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#000000",
+        "x": 460,
+        "y": 2200,
+        "wires": []
+    },
+    {
+        "id": "6acffce0f17db66c",
+        "type": "ui_toast",
+        "z": "d2206452b1fa5f9b",
+        "position": "top right",
+        "displayTime": "3",
+        "highlight": "",
+        "sendall": true,
+        "outputs": 0,
+        "ok": "OK",
+        "cancel": "",
+        "raw": false,
+        "className": "",
+        "topic": "Ventilation",
+        "name": "Ventilation",
+        "x": 1090,
+        "y": 900,
+        "wires": []
+    },
+    {
+        "id": "4ab815473fed6a5e",
+        "type": "function",
+        "z": "d2206452b1fa5f9b",
+        "name": "Fomarter",
+        "func": "if (msg.payload === \"on\"){\n    msg.payload = \"on\"\n    return msg\n} else if (msg.payload === \"off\"){\n    msg.payload = \"admin. off\";\n    return msg;\n}\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1620,
+        "y": 360,
+        "wires": [
+            [
+                "7c063b5da50a0533"
+            ]
+        ]
+    },
+    {
+        "id": "81a3848f3617b31c",
+        "type": "rbe",
+        "z": "d2206452b1fa5f9b",
+        "name": "",
+        "func": "rbe",
+        "gap": "",
+        "start": "",
+        "inout": "out",
+        "septopics": true,
+        "property": "payload",
+        "topi": "topic",
+        "x": 1450,
+        "y": 360,
+        "wires": [
+            [
+                "4ab815473fed6a5e"
+            ]
+        ]
+    },
+    {
+        "id": "ed908f3606843cc5",
+        "type": "subflow:27c2d59ec81a557d",
+        "z": "d2206452b1fa5f9b",
+        "name": "",
+        "env": [
+            {
+                "name": "msg.topic",
+                "value": "Ventilation",
+                "type": "str"
+            }
+        ],
+        "x": 670,
+        "y": 840,
+        "wires": [
+            [
+                "b93da281d2e02e01",
+                "d082f3eb57589c94",
+                "c6d847ac5ae88adc"
+            ]
+        ]
+    },
+    {
+        "id": "d082f3eb57589c94",
+        "type": "switch",
+        "z": "d2206452b1fa5f9b",
+        "name": "Checker",
+        "property": "notification",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "true",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 940,
+        "y": 900,
+        "wires": [
+            [
+                "6acffce0f17db66c"
+            ]
+        ]
+    },
+    {
+        "id": "cb1845f8fe0d6502",
+        "type": "switch",
+        "z": "d2206452b1fa5f9b",
+        "name": "Checker",
+        "property": "notification",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "true",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 940,
+        "y": 1080,
+        "wires": [
+            [
+                "7c1c60d86b6a1a95"
+            ]
+        ]
+    },
+    {
+        "id": "82f40400788fc26b",
+        "type": "function",
+        "z": "d2206452b1fa5f9b",
+        "name": "Notifikacia",
+        "func": "let counter = context.get(\"counter\") || false;\nif (parseInt(msg.payload) <= 150 && counter === true){\n    msg.payload = \"low\";\n    context.set(\"counter\",false);\n    return msg;\n}\nelse if (parseInt(msg.payload) > 150 && counter === false){\n    context.set(\"counter\", true);\n}\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 650,
+        "y": 700,
+        "wires": [
+            [
+                "d184224444b01ea1"
+            ]
+        ]
+    },
+    {
+        "id": "82268b8bd7467f58",
+        "type": "inject",
+        "z": "d2206452b1fa5f9b",
+        "name": "900",
+        "props": [
+            {
+                "p": "payload.waterLevel",
+                "v": "900",
+                "vt": "str"
+            }
+        ],
+        "repeat": "1",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 170,
+        "y": 620,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "b30f1f44a402aa84",
+        "type": "inject",
+        "z": "d2206452b1fa5f9b",
+        "name": "400",
+        "props": [
+            {
+                "p": "payload.waterLevel",
+                "v": "400",
+                "vt": "str"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 170,
+        "y": 680,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "d184224444b01ea1",
+        "type": "ui_toast",
+        "z": "d2206452b1fa5f9b",
+        "position": "top right",
+        "displayTime": "3",
+        "highlight": "",
+        "sendall": true,
+        "outputs": 0,
+        "ok": "OK",
+        "cancel": "",
+        "raw": false,
+        "className": "",
+        "topic": "Water level",
+        "name": "",
+        "x": 860,
+        "y": 700,
+        "wires": []
+    },
+    {
+        "id": "99449d120ada53ad",
+        "type": "inject",
+        "z": "d2206452b1fa5f9b",
+        "name": "400",
+        "props": [
+            {
+                "p": "payload.waterLevel",
+                "v": "0",
+                "vt": "str"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 170,
+        "y": 560,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "fcb68fb08c817b04",
+        "type": "ui_chart",
+        "z": "d2206452b1fa5f9b",
+        "name": "",
+        "group": "3659f6cb53a30391",
+        "order": 4,
+        "width": 6,
+        "height": 5,
+        "label": "Temp. statistics last 24 hour (°C)",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "dd HH:mm",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "86400",
+        "removeOlderUnit": "86400",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#ff0000",
+            "#ff0000",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 690,
+        "y": 120,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "949100559cdd747d",
+        "type": "ui_chart",
+        "z": "d2206452b1fa5f9b",
+        "name": "",
+        "group": "e9060260261f47fc",
+        "order": 4,
+        "width": 6,
+        "height": 5,
+        "label": "Humidity statistics last 24 hour (%)",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "dd HH:mm",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "86400",
+        "removeOlderUnit": "86400",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#00ffff",
+            "#00ffff",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 700,
+        "y": 280,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "e9dc62765076bfb1",
+        "type": "ui_chart",
+        "z": "d2206452b1fa5f9b",
+        "name": "",
+        "group": "37baf4d639caba1d",
+        "order": 4,
+        "width": 6,
+        "height": 5,
+        "label": "Light statistics last 24 hour (lm)",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "dd HH:mm",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "86400",
+        "removeOlderUnit": "86400",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#ffff00",
+            "#aec7e8",
+            "#ffff00",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 730,
+        "y": 440,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "09558f3578840180",
+        "type": "mongodb4",
+        "z": "d2206452b1fa5f9b",
+        "clientNode": "fda16b0e9c1d3eb8",
+        "mode": "collection",
+        "collection": "humid",
+        "operation": "insertOne",
+        "output": "toArray",
+        "maxTimeMS": "0",
+        "handleDocId": false,
+        "name": "",
+        "x": 740,
+        "y": 320,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "cce814f2c83fc0af",
+        "type": "function",
+        "z": "d2206452b1fa5f9b",
+        "name": "toDB",
+        "func": "msg.payload = {\n    type: \"humid\",\n    value: msg.payload,\n    timeStamp: new Date().getTime()\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 610,
+        "y": 320,
+        "wires": [
+            [
+                "09558f3578840180"
+            ]
+        ]
+    },
+    {
+        "id": "c309ca7da79f851d",
+        "type": "mongodb4",
+        "z": "d2206452b1fa5f9b",
+        "clientNode": "fda16b0e9c1d3eb8",
+        "mode": "collection",
+        "collection": "temp",
+        "operation": "insertOne",
+        "output": "toArray",
+        "maxTimeMS": "0",
+        "handleDocId": false,
+        "name": "",
+        "x": 740,
+        "y": 160,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "c267f46f0fdd57f4",
+        "type": "function",
+        "z": "d2206452b1fa5f9b",
+        "name": "toDB",
+        "func": "msg.payload = {\n    type: \"temp\",\n    value: msg.payload,\n    timeStamp: new Date().getTime()\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 610,
+        "y": 160,
+        "wires": [
+            [
+                "c309ca7da79f851d"
+            ]
+        ]
+    },
+    {
+        "id": "b81490e56d4bfa74",
+        "type": "mongodb4",
+        "z": "d2206452b1fa5f9b",
+        "clientNode": "fda16b0e9c1d3eb8",
+        "mode": "collection",
+        "collection": "light",
+        "operation": "insertOne",
+        "output": "toArray",
+        "maxTimeMS": "0",
+        "handleDocId": false,
+        "name": "",
+        "x": 780,
+        "y": 480,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "79bf9838d08d281f",
+        "type": "function",
+        "z": "d2206452b1fa5f9b",
+        "name": "toDB",
+        "func": "msg.payload = {\n    type: \"light\",\n    value: msg.payload,\n    timeStamp: new Date().getTime()\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 650,
+        "y": 480,
+        "wires": [
+            [
+                "b81490e56d4bfa74"
+            ]
+        ]
+    },
+    {
+        "id": "dbab0f2cad504437",
+        "type": "comment",
+        "z": "d2206452b1fa5f9b",
+        "name": "Text dividery",
+        "info": "",
+        "x": 1290,
+        "y": 20,
+        "wires": []
+    },
+    {
+        "id": "2dbd062791b9abf3",
+        "type": "cronplus",
+        "z": "d2206452b1fa5f9b",
+        "name": "Every hour timer",
+        "outputField": "payload",
+        "timeZone": "",
+        "storeName": "",
+        "commandResponseMsgOutput": "output1",
+        "defaultLocation": "",
+        "defaultLocationType": "default",
+        "outputs": 1,
+        "options": [
+            {
+                "name": "schedule1",
+                "topic": "topic1",
+                "payloadType": "date",
+                "payload": "",
+                "expressionType": "cron",
+                "expression": "0 * * * *",
+                "location": "",
+                "offset": "0",
+                "solarType": "all",
+                "solarEvents": "sunrise,sunset"
+            }
+        ],
+        "x": 1420,
+        "y": 660,
+        "wires": [
+            [
+                "96bef3608e3d7bab",
+                "a909d487f285798c"
+            ]
+        ]
+    },
+    {
+        "id": "96bef3608e3d7bab",
+        "type": "function",
+        "z": "d2206452b1fa5f9b",
+        "name": "query",
+        "func": "// find query argument\nconst query = {} // všetky\n\n// find option argument\nconst options = { \n    sort: {timeStamp: -1}, \n    limit: 60*60 // za poslednu hodinu (každu sekundu beriem)\n};\n// payload for mongodb4 node\nmsg.payload = [query,options];\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1630,
+        "y": 660,
+        "wires": [
+            [
+                "cd3efb6edeec10f7",
+                "a9b93d48d85211dc",
+                "65979f61bee0e4ac"
+            ]
+        ]
+    },
+    {
+        "id": "a45dbddcfd9a2503",
+        "type": "comment",
+        "z": "d2206452b1fa5f9b",
+        "name": "Priemery tahanie z Monga",
+        "info": "",
+        "x": 1750,
+        "y": 520,
+        "wires": []
+    },
+    {
+        "id": "cd3efb6edeec10f7",
+        "type": "mongodb4",
+        "z": "d2206452b1fa5f9b",
+        "clientNode": "fda16b0e9c1d3eb8",
+        "mode": "collection",
+        "collection": "temp",
+        "operation": "find",
+        "output": "toArray",
+        "maxTimeMS": "0",
+        "handleDocId": false,
+        "name": "temp finder",
+        "x": 1810,
+        "y": 600,
+        "wires": [
+            [
+                "43e555997f46e96f"
+            ]
+        ]
+    },
+    {
+        "id": "a9b93d48d85211dc",
+        "type": "mongodb4",
+        "z": "d2206452b1fa5f9b",
+        "clientNode": "fda16b0e9c1d3eb8",
+        "mode": "collection",
+        "collection": "humid",
+        "operation": "find",
+        "output": "toArray",
+        "maxTimeMS": "0",
+        "handleDocId": false,
+        "name": "humid finder",
+        "x": 1810,
+        "y": 660,
+        "wires": [
+            [
+                "f9476c4a86a2bdf8"
+            ]
+        ]
+    },
+    {
+        "id": "65979f61bee0e4ac",
+        "type": "mongodb4",
+        "z": "d2206452b1fa5f9b",
+        "clientNode": "fda16b0e9c1d3eb8",
+        "mode": "collection",
+        "collection": "light",
+        "operation": "find",
+        "output": "toArray",
+        "maxTimeMS": "0",
+        "handleDocId": false,
+        "name": "light finder",
+        "x": 1810,
+        "y": 720,
+        "wires": [
+            [
+                "4bef8e26a0d76785"
+            ]
+        ]
+    },
+    {
+        "id": "43e555997f46e96f",
+        "type": "function",
+        "z": "d2206452b1fa5f9b",
+        "name": "Count mean",
+        "func": "let array = msg.payload;\nlet sum = 0;\nfor(let i = 0; i < array.length; i++){\n    sum += array[i].value;\n};\nmsg.payload = (sum / array.length).toFixed(1);\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1990,
+        "y": 600,
+        "wires": [
+            [
+                "73040455c6640006"
+            ]
+        ]
+    },
+    {
+        "id": "f9476c4a86a2bdf8",
+        "type": "function",
+        "z": "d2206452b1fa5f9b",
+        "name": "Count mean",
+        "func": "let array = msg.payload;\nlet sum = 0;\nfor(let i = 0; i < array.length; i++){\n    sum += array[i].value;\n};\nmsg.payload =  (sum / array.length).toFixed(1);\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1990,
+        "y": 660,
+        "wires": [
+            [
+                "e5ce91e47b495d5a"
+            ]
+        ]
+    },
+    {
+        "id": "4bef8e26a0d76785",
+        "type": "function",
+        "z": "d2206452b1fa5f9b",
+        "name": "Count mean",
+        "func": "let array = msg.payload;\nlet sum = 0;\nfor(let i = 0; i < array.length; i++){\n    sum += array[i].value;\n};\nmsg.payload = (sum / array.length).toFixed(1);\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1990,
+        "y": 720,
+        "wires": [
+            [
+                "e39708d0368d9ce7"
+            ]
+        ]
+    },
+    {
+        "id": "809b192f2f0845fd",
+        "type": "cronplus",
+        "z": "d2206452b1fa5f9b",
+        "name": "Every 24 hour ",
+        "outputField": "payload",
+        "timeZone": "",
+        "storeName": "",
+        "commandResponseMsgOutput": "output1",
+        "defaultLocation": "",
+        "defaultLocationType": "default",
+        "outputs": 1,
+        "options": [
+            {
+                "name": "schedule1",
+                "topic": "topic1",
+                "payloadType": "date",
+                "payload": "",
+                "expressionType": "cron",
+                "expression": "0 4  * * * ",
+                "location": "",
+                "offset": "0",
+                "solarType": "all",
+                "solarEvents": "sunrise,sunset"
+            }
+        ],
+        "x": 1420,
+        "y": 920,
+        "wires": [
+            [
+                "b729ead487faed59",
+                "f4d78477ca505b30"
+            ]
+        ]
+    },
+    {
+        "id": "b729ead487faed59",
+        "type": "function",
+        "z": "d2206452b1fa5f9b",
+        "name": "query",
+        "func": "// find query argument\nconst query = {} // všetky\n\n// find option argument\nconst options = { \n    sort: {timeStamp: -1}, \n    limit: 60*60*24 // za poslednu 24h (každu sekundu beriem)\n};\n// payload for mongodb4 node\nmsg.payload = [query,options];\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1630,
+        "y": 920,
+        "wires": [
+            [
+                "7685f0f1a206b070",
+                "64bdfc7c867b9bce",
+                "244eaa01a6ea259f"
+            ]
+        ]
+    },
+    {
+        "id": "7685f0f1a206b070",
+        "type": "mongodb4",
+        "z": "d2206452b1fa5f9b",
+        "clientNode": "fda16b0e9c1d3eb8",
+        "mode": "collection",
+        "collection": "temp",
+        "operation": "find",
+        "output": "toArray",
+        "maxTimeMS": "0",
+        "handleDocId": false,
+        "name": "temp finder",
+        "x": 1810,
+        "y": 860,
+        "wires": [
+            [
+                "828470d8bc8b1fe6"
+            ]
+        ]
+    },
+    {
+        "id": "64bdfc7c867b9bce",
+        "type": "mongodb4",
+        "z": "d2206452b1fa5f9b",
+        "clientNode": "fda16b0e9c1d3eb8",
+        "mode": "collection",
+        "collection": "humid",
+        "operation": "find",
+        "output": "toArray",
+        "maxTimeMS": "0",
+        "handleDocId": false,
+        "name": "humid finder",
+        "x": 1810,
+        "y": 920,
+        "wires": [
+            [
+                "dfb3147f5804b0b3"
+            ]
+        ]
+    },
+    {
+        "id": "244eaa01a6ea259f",
+        "type": "mongodb4",
+        "z": "d2206452b1fa5f9b",
+        "clientNode": "fda16b0e9c1d3eb8",
+        "mode": "collection",
+        "collection": "light",
+        "operation": "find",
+        "output": "toArray",
+        "maxTimeMS": "0",
+        "handleDocId": false,
+        "name": "light finder",
+        "x": 1810,
+        "y": 980,
+        "wires": [
+            [
+                "ae741dc74c100364"
+            ]
+        ]
+    },
+    {
+        "id": "828470d8bc8b1fe6",
+        "type": "function",
+        "z": "d2206452b1fa5f9b",
+        "name": "Count mean",
+        "func": "let array = msg.payload;\nlet sum = 0;\nfor(let i = 0; i < array.length; i++){\n    sum += array[i].value;\n};\nmsg.payload = (sum / array.length).toFixed(1);\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1990,
+        "y": 860,
+        "wires": [
+            [
+                "c09dedcfd7e3e67c"
+            ]
+        ]
+    },
+    {
+        "id": "dfb3147f5804b0b3",
+        "type": "function",
+        "z": "d2206452b1fa5f9b",
+        "name": "Count mean",
+        "func": "let array = msg.payload;\nlet sum = 0;\nfor(let i = 0; i < array.length; i++){\n    sum += array[i].value;\n};\nmsg.payload = (sum / array.length).toFixed(1);\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1990,
+        "y": 920,
+        "wires": [
+            [
+                "ecd5f011db04e68a"
+            ]
+        ]
+    },
+    {
+        "id": "ae741dc74c100364",
+        "type": "function",
+        "z": "d2206452b1fa5f9b",
+        "name": "Count mean",
+        "func": "let array = msg.payload;\nlet sum = 0;\nfor(let i = 0; i < array.length; i++){\n    sum += array[i].value;\n};\nmsg.payload = (sum / array.length).toFixed(1);\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1990,
+        "y": 980,
+        "wires": [
+            [
+                "c6d299437cb344a8"
+            ]
+        ]
+    },
+    {
+        "id": "73040455c6640006",
+        "type": "ui_text",
+        "z": "d2206452b1fa5f9b",
+        "group": "3659f6cb53a30391",
+        "order": 1,
+        "width": 6,
+        "height": 1,
+        "name": "",
+        "label": "Avarage temp. last hour:",
+        "format": "{{msg.payload}} °C",
+        "layout": "row-spread",
+        "className": "",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#000000",
+        "x": 2230,
+        "y": 600,
+        "wires": []
+    },
+    {
+        "id": "e5ce91e47b495d5a",
+        "type": "ui_text",
+        "z": "d2206452b1fa5f9b",
+        "group": "e9060260261f47fc",
+        "order": 1,
+        "width": 6,
+        "height": 1,
+        "name": "",
+        "label": "Avarage humidity last hour:",
+        "format": "{{msg.payload}} %",
+        "layout": "row-spread",
+        "className": "",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#000000",
+        "x": 2240,
+        "y": 660,
+        "wires": []
+    },
+    {
+        "id": "e39708d0368d9ce7",
+        "type": "ui_text",
+        "z": "d2206452b1fa5f9b",
+        "group": "37baf4d639caba1d",
+        "order": 1,
+        "width": 6,
+        "height": 1,
+        "name": "",
+        "label": "Avarage light level last hour:",
+        "format": "{{msg.payload}} lm",
+        "layout": "row-spread",
+        "className": "",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#000000",
+        "x": 2240,
+        "y": 720,
+        "wires": []
+    },
+    {
+        "id": "c09dedcfd7e3e67c",
+        "type": "ui_text",
+        "z": "d2206452b1fa5f9b",
+        "group": "3659f6cb53a30391",
+        "order": 2,
+        "width": 6,
+        "height": 1,
+        "name": "",
+        "label": "Avarage temp. last 24 hour:",
+        "format": "{{msg.payload}} °C",
+        "layout": "row-spread",
+        "className": "",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#000000",
+        "x": 2240,
+        "y": 860,
+        "wires": []
+    },
+    {
+        "id": "ecd5f011db04e68a",
+        "type": "ui_text",
+        "z": "d2206452b1fa5f9b",
+        "group": "e9060260261f47fc",
+        "order": 2,
+        "width": 6,
+        "height": 1,
+        "name": "",
+        "label": "Avarage humidity last 24 hour:",
+        "format": "{{msg.payload}} %",
+        "layout": "row-spread",
+        "className": "",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#000000",
+        "x": 2250,
+        "y": 920,
+        "wires": []
+    },
+    {
+        "id": "c6d299437cb344a8",
+        "type": "ui_text",
+        "z": "d2206452b1fa5f9b",
+        "group": "37baf4d639caba1d",
+        "order": 2,
+        "width": 6,
+        "height": 1,
+        "name": "",
+        "label": "Avarage light level last 24 hour:",
+        "format": "{{msg.payload}} lm",
+        "layout": "row-spread",
+        "className": "",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#000000",
+        "x": 2250,
+        "y": 980,
+        "wires": []
+    },
+    {
+        "id": "fe3bbb4631fd93dc",
+        "type": "ui_text",
+        "z": "d2206452b1fa5f9b",
+        "group": "37baf4d639caba1d",
+        "order": 3,
+        "width": 6,
+        "height": 1,
+        "name": "",
+        "label": "------------------------------",
+        "format": "",
+        "layout": "row-center",
+        "className": "",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#000000",
+        "x": 1680,
+        "y": 160,
+        "wires": []
+    },
+    {
+        "id": "22ed39056a566748",
+        "type": "ui_text",
+        "z": "d2206452b1fa5f9b",
+        "group": "3659f6cb53a30391",
+        "order": 3,
+        "width": 6,
+        "height": 1,
+        "name": "",
+        "label": "------------------------------",
+        "format": "",
+        "layout": "row-center",
+        "className": "",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#000000",
+        "x": 1680,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "8c1eea44548c2127",
+        "type": "ui_text",
+        "z": "d2206452b1fa5f9b",
+        "group": "e9060260261f47fc",
+        "order": 3,
+        "width": 6,
+        "height": 1,
+        "name": "",
+        "label": "------------------------------",
+        "format": "",
+        "layout": "row-center",
+        "className": "",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#000000",
+        "x": 1680,
+        "y": 120,
+        "wires": []
+    },
+    {
+        "id": "015ad6b0161a2767",
+        "type": "ui_chart",
+        "z": "d2206452b1fa5f9b",
+        "name": "",
+        "group": "c73ff268ceb52efb",
+        "order": 4,
+        "width": 6,
+        "height": 5,
+        "label": "Water statistics last 24 hour (l)",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "dd HH:mm",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "86400",
+        "removeOlderUnit": "86400",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#0000ff",
+            "#0000ff",
+            "#ffff00",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 730,
+        "y": 600,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "6e55ca6f0e2fd6cb",
+        "type": "mongodb4",
+        "z": "d2206452b1fa5f9b",
+        "clientNode": "fda16b0e9c1d3eb8",
+        "mode": "collection",
+        "collection": "water",
+        "operation": "insertOne",
+        "output": "toArray",
+        "maxTimeMS": "0",
+        "handleDocId": false,
+        "name": "",
+        "x": 780,
+        "y": 640,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "90a876c938049533",
+        "type": "function",
+        "z": "d2206452b1fa5f9b",
+        "name": "toDB",
+        "func": "msg.payload = {\n    type: \"water\",\n    value: parseInt(msg.payload),\n    timeStamp: new Date().getTime()\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 650,
+        "y": 640,
+        "wires": [
+            [
+                "6e55ca6f0e2fd6cb"
+            ]
+        ]
+    },
+    {
+        "id": "a909d487f285798c",
+        "type": "function",
+        "z": "d2206452b1fa5f9b",
+        "name": "query Water",
+        "func": "// tam robim priemer z 3 hodnot preto musim podelit troma aby som \n// ziskam počet za poslednu hodinu atď\n\n// find query argument\nconst query = {} // všetky\n\n// find option argument\nconst options = { \n    sort: {timeStamp: -1}, \n    limit: (60*60)/3 // za poslednu hodinu (každu sekundu beriem)\n};\n// payload for mongodb4 node\nmsg.payload = [query,options];\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1650,
+        "y": 780,
+        "wires": [
+            [
+                "31e23213dfadac35"
+            ]
+        ]
+    },
+    {
+        "id": "31e23213dfadac35",
+        "type": "mongodb4",
+        "z": "d2206452b1fa5f9b",
+        "clientNode": "fda16b0e9c1d3eb8",
+        "mode": "collection",
+        "collection": "water",
+        "operation": "find",
+        "output": "toArray",
+        "maxTimeMS": "0",
+        "handleDocId": false,
+        "name": "water finder",
+        "x": 1810,
+        "y": 780,
+        "wires": [
+            [
+                "f7203c09590eb757"
+            ]
+        ]
+    },
+    {
+        "id": "f7203c09590eb757",
+        "type": "function",
+        "z": "d2206452b1fa5f9b",
+        "name": "Count mean",
+        "func": "let array = msg.payload;\nlet sum = 0;\nfor(let i = 0; i < array.length; i++){\n    sum += array[i].value;\n};\nmsg.payload = (sum / array.length).toFixed(1);\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1990,
+        "y": 780,
+        "wires": [
+            [
+                "80759acaf1f9be76"
+            ]
+        ]
+    },
+    {
+        "id": "80759acaf1f9be76",
+        "type": "ui_text",
+        "z": "d2206452b1fa5f9b",
+        "group": "c73ff268ceb52efb",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Avarage water level last hour:",
+        "format": "{{msg.payload}} l",
+        "layout": "row-spread",
+        "className": "",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#000000",
+        "x": 2250,
+        "y": 780,
+        "wires": []
+    },
+    {
+        "id": "f4d78477ca505b30",
+        "type": "function",
+        "z": "d2206452b1fa5f9b",
+        "name": "query Water",
+        "func": "// tam robim priemer z 3 hodnot preto musim podelit troma aby som \n// ziskam počet za poslednu hodinu atď\n\n// find query argument\nconst query = {} // všetky\n\n// find option argument\nconst options = { \n    sort: {timeStamp: -1}, \n    limit: (60*60*24)/3 // za poslednu hodinu (každu sekundu beriem)\n};\n// payload for mongodb4 node\nmsg.payload = [query,options];\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1610,
+        "y": 1060,
+        "wires": [
+            [
+                "5dc2e19cb5aa6499"
+            ]
+        ]
+    },
+    {
+        "id": "5dc2e19cb5aa6499",
+        "type": "mongodb4",
+        "z": "d2206452b1fa5f9b",
+        "clientNode": "fda16b0e9c1d3eb8",
+        "mode": "collection",
+        "collection": "water",
+        "operation": "find",
+        "output": "toArray",
+        "maxTimeMS": "0",
+        "handleDocId": false,
+        "name": "water finder",
+        "x": 1810,
+        "y": 1060,
+        "wires": [
+            [
+                "f9df5ea99578362d"
+            ]
+        ]
+    },
+    {
+        "id": "f9df5ea99578362d",
+        "type": "function",
+        "z": "d2206452b1fa5f9b",
+        "name": "Count mean",
+        "func": "let array = msg.payload;\nlet sum = 0;\nfor(let i = 0; i < array.length; i++){\n    sum += array[i].value;\n};\nmsg.payload = (sum / array.length).toFixed(1);\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1990,
+        "y": 1060,
+        "wires": [
+            [
+                "25110db49ee1f8bc"
+            ]
+        ]
+    },
+    {
+        "id": "25110db49ee1f8bc",
+        "type": "ui_text",
+        "z": "d2206452b1fa5f9b",
+        "group": "c73ff268ceb52efb",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Avarage water level last 24 hour:",
+        "format": "{{msg.payload}} l",
+        "layout": "row-spread",
+        "className": "",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#000000",
+        "x": 2260,
+        "y": 1060,
+        "wires": []
+    },
+    {
+        "id": "f3dae59ced805e96",
+        "type": "ui_text",
+        "z": "d2206452b1fa5f9b",
+        "group": "c73ff268ceb52efb",
+        "order": 3,
+        "width": 6,
+        "height": 1,
+        "name": "",
+        "label": "------------------------------",
+        "format": "",
+        "layout": "row-center",
+        "className": "",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#000000",
+        "x": 1680,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "af1f729639793224",
+        "type": "ui_spacer",
+        "z": "d2206452b1fa5f9b",
+        "name": "spacer",
+        "group": "4ec2e199b2173ff3",
+        "order": 2,
+        "width": 6,
+        "height": 1
+    },
+    {
+        "id": "fa66101f9e239389",
+        "type": "ui_spacer",
+        "z": "d2206452b1fa5f9b",
+        "name": "spacer",
+        "group": "aae5e5ea7298c88d",
+        "order": 2,
+        "width": 6,
+        "height": 1
+    },
+    {
+        "id": "427e68e619226e0a",
+        "type": "mqtt-broker",
+        "name": "IOT-MQTT",
+        "broker": "broker",
+        "port": "1883",
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "autoUnsubscribe": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthRetain": "false",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closeRetain": "false",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willRetain": "false",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    },
+    {
+        "id": "fdfa0c72f1d76fe4",
+        "type": "ui_group",
+        "name": "Temperature information",
+        "tab": "108ea5de577ab7c5",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": true,
+        "className": ""
+    },
+    {
+        "id": "3d4fb68580f7a28e",
+        "type": "ui_group",
+        "name": "Humidity information",
+        "tab": "108ea5de577ab7c5",
+        "order": 2,
+        "disp": true,
+        "width": "6",
+        "collapse": true,
+        "className": ""
+    },
+    {
+        "id": "faca84dd02887070",
+        "type": "ui_group",
+        "name": "Sun & Weather information",
+        "tab": "108ea5de577ab7c5",
+        "order": 3,
+        "disp": true,
+        "width": "6",
+        "collapse": true,
+        "className": ""
+    },
+    {
+        "id": "55e9dd8cd7e2c535",
+        "type": "ui_group",
+        "name": "Water information",
+        "tab": "108ea5de577ab7c5",
+        "order": 4,
+        "disp": true,
+        "width": "6",
+        "collapse": true,
+        "className": ""
+    },
+    {
+        "id": "430ad6f95d0ddfa3",
+        "type": "ui_group",
+        "name": "Value setters",
+        "tab": "28493ce619b69c13",
+        "order": 3,
+        "disp": true,
+        "width": "7",
+        "collapse": true,
+        "className": ""
+    },
+    {
+        "id": "cd549b9206037b0a",
+        "type": "ui_group",
+        "name": "Control information",
+        "tab": "28493ce619b69c13",
+        "order": 2,
+        "disp": true,
+        "width": "6",
+        "collapse": true,
+        "className": ""
+    },
+    {
+        "id": "3af087ba73d32313",
+        "type": "ui_group",
+        "name": "Control modes",
+        "tab": "28493ce619b69c13",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": true,
+        "className": ""
+    },
+    {
+        "id": "3659f6cb53a30391",
+        "type": "ui_group",
+        "name": "Temperature statistics",
+        "tab": "108ea5de577ab7c5",
+        "order": 5,
+        "disp": true,
+        "width": 6,
+        "collapse": true,
+        "className": ""
+    },
+    {
+        "id": "e9060260261f47fc",
+        "type": "ui_group",
+        "name": "Humidity statistics",
+        "tab": "108ea5de577ab7c5",
+        "order": 6,
+        "disp": true,
+        "width": 6,
+        "collapse": true,
+        "className": ""
+    },
+    {
+        "id": "37baf4d639caba1d",
+        "type": "ui_group",
+        "name": "Light statistics",
+        "tab": "108ea5de577ab7c5",
+        "order": 7,
+        "disp": true,
+        "width": 6,
+        "collapse": true,
+        "className": ""
+    },
+    {
+        "id": "fda16b0e9c1d3eb8",
+        "type": "mongodb4-client",
+        "name": "MongoDB",
+        "protocol": "mongodb",
+        "hostname": "mongo-S10",
+        "port": "",
+        "dbName": "IoT",
+        "appName": "",
+        "authSource": "",
+        "authMechanism": "DEFAULT",
+        "tls": false,
+        "tlsCAFile": "",
+        "tlsCertificateKeyFile": "",
+        "tlsInsecure": false,
+        "connectTimeoutMS": "30000",
+        "socketTimeoutMS": "0",
+        "minPoolSize": "0",
+        "maxPoolSize": "100",
+        "maxIdleTimeMS": "0",
+        "uri": "",
+        "advanced": "{}",
+        "uriTabActive": "tab-uri-simple"
+    },
+    {
+        "id": "c73ff268ceb52efb",
+        "type": "ui_group",
+        "name": "Water statistics",
+        "tab": "108ea5de577ab7c5",
+        "order": 8,
+        "disp": true,
+        "width": "6",
+        "collapse": true,
+        "className": ""
+    },
+    {
+        "id": "108ea5de577ab7c5",
+        "type": "ui_tab",
+        "name": "Statistics - semestralka",
+        "icon": "dashboard",
+        "order": 1,
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "28493ce619b69c13",
+        "type": "ui_tab",
+        "name": "Control - semestralka",
+        "icon": "dashboard",
+        "order": 2,
+        "disabled": false,
+        "hidden": false
+    }
+]
