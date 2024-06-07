@@ -1,0 +1,9 @@
+#BlueJ class context
+comment0.target=VytvorTeam
+comment0.text=\r\n\ Trieda\ je\ pomocna\ a\ nudzov\u00E1\ v\ pripada\u017Ee\ mi\ zmizne\ subor\ s\ ulo\u017Eenimi\ teamami\r\n\r\n\ @author\ \ \ \u00ABmeno\ autora\u00BB\r\n\ @version\ \ \u00ABverzia\ alebo\ d\u00E1tum\u00BB\r\n
+comment1.params=args
+comment1.target=void\ main(java.lang.String[])
+comment2.params=
+comment2.target=void\ loadDefaulTeam()
+comment2.text=tato\ metoda\ tu\ je\ len\ pre\ istotu\ a\ budem\ v\ nej\ mat\ ulo\u017Een\u00FDch\ hra\u010Dov\ *
+numComments=3

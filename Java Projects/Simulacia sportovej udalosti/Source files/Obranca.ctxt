@@ -1,0 +1,18 @@
+#BlueJ class context
+comment0.target=Obranca
+comment0.text=\r\n\ Trieda\ {@code\ Obranca}\ sl\u00FA\u017Ei\ na\ vytvorenie\ obrancu,\ ktory\ mo\u017Ee\ dat\ gol\ a\ asistenciuz\r\n\ preto\ ma\ atributy\ pocetGolov\ ,pocetasistenci\r\n\r\n\ @author\ \ \ \u00ABmeno\ autora\u00BB\r\n\ @version\ \ \u00ABverzia\ alebo\ d\u00E1tum\u00BB\r\n
+comment1.params=meno\ priezvisko\ vek\ cisloDresu\ obranaPoints\ utokPoints
+comment1.target=Obranca(java.lang.String,\ java.lang.String,\ int,\ int,\ double,\ double)
+comment2.params=
+comment2.target=Obranca()
+comment3.params=
+comment3.target=int\ getPocetGolov()
+comment4.params=
+comment4.target=void\ addGol()
+comment5.params=
+comment5.target=void\ addAsistencia()
+comment6.params=
+comment6.target=int\ getPocetAsistenci()
+comment7.params=
+comment7.target=int\ getBody()
+numComments=8

@@ -1,0 +1,8 @@
+#BlueJ class context
+comment0.target=Brankar
+comment0.text=\r\n\ Trieda\ {@code\ Brankar}\ vytvorenie\ objektu\ brankara\ \r\n\r\n\ @author\ \ \ \u00ABmeno\ autora\u00BB\r\n\ @version\ \ \u00ABverzia\ alebo\ d\u00E1tum\u00BB\r\n
+comment1.params=meno\ priezvisko\ vek\ cisloDresu\ obranaPoints\ utokPoints
+comment1.target=Brankar(java.lang.String,\ java.lang.String,\ int,\ int,\ double,\ double)
+comment2.params=
+comment2.target=Brankar()
+numComments=3

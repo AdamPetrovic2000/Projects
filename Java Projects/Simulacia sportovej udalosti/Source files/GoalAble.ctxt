@@ -1,0 +1,14 @@
+#BlueJ class context
+comment0.target=GoalAble
+comment0.text=\r\n\ Rozhranie\ na\ to\ aby\ som\ mohol\ rozdelit\ hracov\ na\ tych\ ktori\ mozu\ dat\ gol\ a\ ktory\ nie\r\n\r\n\ @author\ \ \ \u00ABmeno\ autora\u00BB\r\n\ @version\ \ \u00ABverzia\ alebo\ d\u00E1tum\u00BB\r\n
+comment1.params=
+comment1.target=void\ addGol()
+comment2.params=
+comment2.target=void\ addAsistencia()
+comment3.params=
+comment3.target=int\ getPocetGolov()
+comment4.params=
+comment4.target=int\ getPocetAsistenci()
+comment5.params=
+comment5.target=int\ getBody()
+numComments=6

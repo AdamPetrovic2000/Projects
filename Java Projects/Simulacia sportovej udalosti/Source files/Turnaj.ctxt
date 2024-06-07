@@ -1,0 +1,6 @@
+#BlueJ class context
+comment0.target=Turnaj
+comment0.text=\r\n\ Trieda\ Turnaj\ bude\ n\u00E1m\ bude\ spustac\ cel\u00FD\ turnaj\ je\ v\ nej\ metoda\ main()\ v\ ktorej\ bude\ aj\ konzola,1-\ spusti\ turnaj,2-\ moznost\ vytvorenia\ nov\u00E9ho\ tymu\ ktory\ nahrady\r\n\ jeden\ z\ povodnych,\ 3-vypis\ hracov\ z\ jedneho\ tymu,\ 4-end.\ dalej\ kazda\ kazda\ z\ tychto\ casti\ bude\ mat\ svoje\ podcasti\ kde\ v\ turnaji\ sa\ budu\ ziskat\ najlepsieho\r\n\ hraca\ dan\u00E9ho\ zapasu\ a\ na\ konci\ bud\u00FA\ aj\ najelpsi\ hraci\ zo\ vsetkych\ teamov,v\ moznosti\ vytvorenia\ bude\ taktiez\ mozne\ vratit\ spat\ povodne(defaulte)\ teamy.\r\n
+comment1.params=args
+comment1.target=void\ main(java.lang.String[])
+numComments=2

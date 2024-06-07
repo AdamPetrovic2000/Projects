@@ -1,0 +1,22 @@
+#BlueJ class context
+comment0.target=Hrac
+comment0.text=\r\n\ Trieda\ Hrac\ dedi\ od\ osoby\ \ a\ doplnuje\ o\ cislo\ atributy\ cisloDresu\ a\ PoziciaHraca,\ obranaPoints,\ utokPoints,\ a\ gettery\ a\ settery\ spojene\ s\ nimi\r\n\r\n\ @author\ \ \ \u00ABmeno\ autora\u00BB\r\n\ @version\ \ \u00ABverzia\ alebo\ d\u00E1tum\u00BB\r\n
+comment1.params=meno\ priezvisko\ vek\ cisloDresu\ poziciaHraca\ obranaPoints\ utokPoints
+comment1.target=Hrac(java.lang.String,\ java.lang.String,\ int,\ int,\ java.lang.String,\ double,\ double)
+comment2.params=
+comment2.target=Hrac()
+comment3.params=
+comment3.target=int\ getCisloDresu()
+comment4.params=cisloDresu
+comment4.target=void\ setCisloDresu(int)
+comment5.params=
+comment5.target=java.lang.String\ getPoziciuHraca()
+comment6.params=poz
+comment6.target=void\ setPoziciuHraca(java.lang.String)
+comment7.params=
+comment7.target=double\ getObranaPoints()
+comment8.params=
+comment8.target=double\ getUtokPoints()
+comment9.params=
+comment9.target=java.lang.String\ getInfo()
+numComments=10
