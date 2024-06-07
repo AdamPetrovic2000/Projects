@@ -1,0 +1,16 @@
+Jožo      Procko      48
+Player24      8
+PlayerAdam      40
+Adam      40
+Adam      40
+Adam      40
+Adam      40
+Adam      40
+Player2      33
+Player2      33
+Igor      32
+Jano      32
+Adam      28
+Jozef      24
+playwer      24      5
+Player24      0

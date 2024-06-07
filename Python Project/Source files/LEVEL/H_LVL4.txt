@@ -1,0 +1,4 @@
+Meter (m) je vzdialenos, ktorú prejde svetlo vo vákuu za èasovı interval 1/299 792 458 sekundy.
+Napríklad zo vzahu pre prácu (W) za istıch podmienok platí W=F.s, kde F je sila a s je dráha.
+1 Farad (F) zodpovedá kapacite telesa, ktoré sa nábojom 1 Columb (C) nabije na pontecial 1 Volt (V).
+xx
